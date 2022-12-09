@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card mt-4" style="border:2px solid black;">
+    <div class="card-body">
+        <p class="card-text" style="text-align:right;">{{ card.status }}</p>
+        <h5 class="card-title">{{ card.series }} - {{ card.number }}</h5>
+        <p class="card-text">Release date: {{ card.release_date | date:"d F Y | G:i"}}</p>
+        <p class="card-text">Expiration date: {{ card.expiration_date | date:"d F Y | G:i"}}</p>
+        <p class="card-text">Last usage: {{ card.last_usage }}</p>
+        <p class="card-text">Amount: {{ card.amount }}</p>
+    </div>
+</div>
+
+{% endblock %}
