@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.shortcuts import render, redirect, reverse
 from django.shortcuts import get_object_or_404
+from django.http.response import HttpResponse
 
 from .models import Card
 from .forms import IncreaseAmountForm
@@ -34,7 +35,7 @@ def get_card_detail(request, id):
     context = {
         'card': card,
         'form': form,
-        'data': data,
+        'data': reversed(data),
     }
     return render(request, 'card.html', context)
 
@@ -63,7 +64,7 @@ def increase_amount(request, id):
     card.save()
 
     log_data = {
-        'time': datetime.now().strftime('%d %B %Y | %I:%M'),
+        'time': datetime.now().strftime('%d %B %Y | %H:%M'),
         'card_id': card.pk,
         'amount': f'+{amount}',
         'total_amount': total_amount,
@@ -82,3 +83,31 @@ def delete_card(request, id):
     Card.objects.get(pk=id).delete()
 
     return redirect('main')
+
+
+def buy_something(request, id):
+
+    # TODO: create products with different cost and write off the balance according product's cost. Now it's 1000
+
+    card = Card.objects.get(pk=id)
+    card_amount = card.amount
+
+    if card_amount >= 1000:
+        total_amount = card_amount - 1000
+    else:
+        return HttpResponse('Balance less than purchase amount!')
+
+    card.amount = total_amount
+    card.save()
+
+    log_data = {
+        'time': datetime.now().strftime('%d %B %Y | %H:%M'),
+        'card_id': card.pk,
+        'amount': f'-1000',
+        'total_amount': total_amount,
+    }
+
+    with open('amount.log', 'a') as a:
+        a.write(json.dumps(log_data) + '\n')
+
+    return redirect(reverse('card', kwargs={'id': id}))

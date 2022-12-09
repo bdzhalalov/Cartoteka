@@ -9,6 +9,11 @@
         <p class="card-text">Expiration date: {{ card.expiration_date | date:"d F Y | G:i"}}</p>
         <p class="card-text">Last usage: {{ card.last_usage | date:"d F Y | G:i"}}</p>
         <p class="card-text">Amount: {{ card.amount }}</p>
+        {% if card.status == 'not activated' %}
+            <a href="{% url 'activate' card.id %}" class="btn btn-primary">Activate card</a>
+        {% else %}
+            <a href="#" class="btn btn-primary">Extend card validity</a>
+        {% endif %}
     </div>
 </div>
 {% if card.status == 'active' %}
@@ -17,10 +22,12 @@
         {% csrf_token %}
         <button type="submit" class="btn btn-success">Increase amount</button>
     </form>
-{% elif card.status == 'not activated' %}
-        <a href="{% url 'activate' card.id %}" class="btn btn-primary">Activate card</a>
-{% else %}
-        <a href="#" class="btn btn-primary">Extend card validity</a>
+{% endif %}
+{% if card.status == 'active' %}
+    <form action="{% url 'buy' card.id %}" method="post" style="margin-top: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Buy something</button>
+    </form>
 {% endif %}
 
 <a href="{% url 'delete' card.id %}" class="btn btn-danger" style="margin-top: 10px; position: relative; left: 1190px;">Delete card</a>
