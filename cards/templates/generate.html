@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form class="col-sm-6" action="{% url 'generate' %}" method="post" style="margin-top: 10px; padding: 30px; border: 2px solid black; ">
+        {{ form }}
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Generate card</button>
+    </form>
+{% endblock %}

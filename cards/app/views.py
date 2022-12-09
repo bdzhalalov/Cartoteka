@@ -1,12 +1,14 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from random import randint
 
 from django.shortcuts import render, redirect, reverse
 from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponse
+from django.views.generic import CreateView
 
 from .models import Card
-from .forms import IncreaseAmountForm
+from .forms import IncreaseAmountForm, GenerateCardForm
 
 
 def index(request):
@@ -111,3 +113,38 @@ def buy_something(request, id):
         a.write(json.dumps(log_data) + '\n')
 
     return redirect(reverse('card', kwargs={'id': id}))
+
+
+class GenerateView(CreateView):
+
+    template_name = 'generate.html'
+
+    def get(self, request, *args, **kwargs):
+        form = GenerateCardForm()
+        context = {
+            'form': form
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+
+        form = GenerateCardForm(request.POST)
+
+        if form.is_valid():
+            series = form.cleaned_data.get('series')
+            count = form.cleaned_data.get('count')
+            expiration_date = dict(GenerateCardForm.CHOICES).get(form.cleaned_data.get('expiration_date'))
+
+            for card in range(1, count + 1):
+                card = Card.objects.create(
+                    series=series, number=randint(10000, 99999),
+                    expiration_date=datetime.now()+timedelta(days=expiration_date)
+                )
+
+            return redirect('main')
+
+        context = {
+            'form': form
+        }
+
+        return render(request, self.template_name, context)
