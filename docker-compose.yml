@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: cartoteka
+    build: .
+    command: sh -c "python cards/manage.py migrate && python cards/manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./:/var/app/
+
+    ports:
+      - "8000:8000"
+
+  db:
+    container_name: cartoteka_db
+    image: mysql:latest
+    volumes:
+      - mysql_data:/var/lib/mysql/
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:
