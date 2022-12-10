@@ -32,7 +32,6 @@ def get_card_detail(request, id):
     for el in amount_data:
         if el['card_id'] == id:
             data.append(el)
-    print(data)
 
     context = {
         'card': card,
